@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "pyboschtt"
+version = "0.1.0"
+description = ""
+authors = ["Kristoffer Sjöberg <ksjoberg+github@q1.se>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+aiohttp = "^3.8.1"
+async-timeout = "^4.0.2"
+beautifulsoup4 = "^4.11.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.0"
+flake8 = "^6.0.0"
+autopep8 = "^2.0.1"
+pytest-asyncio = "^0.20.3"
+nest-asyncio = "^1.5.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
