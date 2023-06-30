@@ -286,27 +286,21 @@ class BoschTTOAuth:
             authurl, allow_redirects=True, skip_auto_headers=("user-agent",)
         )
         result.raise_for_status()
-        soup = BeautifulSoup(await result.read(), "html.parser")
-        payload = {}
-        for htmlinput in soup.find_all("input"):
-            if not htmlinput.get("name"):
-                continue
-            payload[htmlinput.get("name")] = (
-                htmlinput.get("value") if htmlinput.get(
-                    "value") != None else ""
-            )
+        payload = {
+            "username": email,
+            "password": password,
+            "keepMeSignedIn": "false",
+            "returnUrl": result.url.query["ReturnUrl"]
+        }
+        xsrftoken = result.cookies["X-CSRF-FORM-TOKEN"].value
+        location = result.url.join(URL("/auth/api/v1/authentication/login"))
+        result = await self.websession.post(location, headers={"Requestverificationtoken": xsrftoken}, json=payload)
 
-        for k in payload.keys():
-            if "email" in k.lower():
-                payload[k] = email
-            elif "password" in k.lower():
-                payload[k] = password
+        jsonanswer = await result.json()
+        returnurl = result.url.join(URL(jsonanswer["returnUrl"]))
 
-        resp = await self.websession.post(
-            result.url,
-            data=payload,
-            allow_redirects=False,
-            skip_auto_headers=("user-agent",),
+        resp = await self.websession.get(
+            returnurl, allow_redirects=False, skip_auto_headers=("user-agent",)
         )
         resp.raise_for_status()
         while resp.status in (301, 302):
